@@ -5,197 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jo Delícias - Monte sua Marmita</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <style>
-        :root { --primary: #D65A18; --bg: #FDF6E3; --white: #fff; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; color: #2C3E50; }
+        :root { --primary: #D65A18; --bg: #FDF6E3; --white: #fff; --text: #2C3E50; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; color: var(--text); padding-bottom: 40px; }
         
-        header { background: var(--primary); color: var(--white); text-align: center; padding: 20px; border-radius: 0 0 20px 20px; }
-        .container { max-width: 600px; margin: 20px auto; padding: 0 20px; }
-        
-        .section-title { color: var(--primary); border-bottom: 2px solid var(--primary); margin-top: 30px; }
-        
-        /* Grid de Opções */
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        label { background: var(--white); padding: 12px; border-radius: 8px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        input[type="checkbox"] { accent-color: var(--primary); margin-right: 10px; transform: scale(1.2); }
+        header { background: var(--primary); color: var(--white); text-align: center; padding: 25px 20px; border-radius: 0 0 25px 25px; box-shadow: 0 4px 10px rgba(214, 90, 24, 0.3); }
+        header h1 { margin: 0; font-size: 1.8rem; }
+        header p { margin: 5px 0 0; opacity: 0.9; }
 
-        /* Botão Principal */
+        .container { max-width: 600px; margin: -20px auto 0; padding: 0 20px; position: relative; z-index: 2; }
+        
+        .card { background: var(--white); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        .section-title { color: var(--primary); border-bottom: 2px solid #fee; padding-bottom: 8px; margin-top: 10px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 15px; }
+        
+        label { 
+            background: #f8f9fa; padding: 12px; border-radius: 8px; display: flex; align-items: center; 
+            cursor: pointer; transition: 0.2s; border: 1px solid transparent;
+        }
+        label:hover { background: #fff5f0; border-color: var(--primary); }
+        
+        input[type="checkbox"] { accent-color: var(--primary); width: 20px; height: 20px; margin-right: 12px; }
+
+        .info-box { background: #e3f2fd; color: #0d47a1; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 15px; border-left: 4px solid #2196f3; }
+
+        input[type="text"] {
+            width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px;
+            font-family: inherit; box-sizing: border-box; font-size: 1rem;
+        }
+
         button {
-            background-color: #25D366; color: white; border: none; width: 100%; padding: 15px;
-            font-size: 1.1rem; font-weight: bold; border-radius: 50px; cursor: pointer; margin: 40px 0 60px 0;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            background-color: #25D366; color: white; border: none; width: 100%; padding: 16px;
+            font-size: 1.1rem; font-weight: 800; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); display: flex; justify-content: center; align-items: center; gap: 10px;
+            transition: transform 0.2s;
         }
+        button:active { transform: scale(0.98); }
 
-        /* Área Oculta da Imagem */
-        #pedido-imagem {
-            background: white; padding: 20px; border: 4px solid var(--primary);
-            position: fixed; top: -9999px; left: -9999px; width: 400px; /* Largura fixa para boa resolução */
-            color: #000; font-family: 'Poppins', sans-serif;
-        }
-        ul { padding-left: 20px; margin: 5px 0; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>Jo Delícias</h1>
-    <p>Monte sua Marmita</p>
+    <p>Monte seu Pacote de Marmitas</p>
 </header>
 
 <div class="container">
-    <div style="background:#fff3cd; color:#856404; padding:10px; border-radius:5px; font-size:0.9rem;">
-        <strong>Regra do Pacote:</strong> Mínimo 10 marmitas (5 carne / 5 frango).
+    
+    <div class="card" style="margin-top: 20px;">
+        <div class="info-box">
+            <strong>📦 Regra do Pacote:</strong><br>
+            Mínimo 10 marmitas (5 carne / 5 frango).
+        </div>
+
+        <div style="text-align: center; margin-bottom: 15px;">
+            <label for="clienteNome" style="display:block; text-align:left; font-weight:600; background:none; padding:0;">Seu Nome:</label>
+            <input type="text" id="clienteNome" placeholder="Digite seu nome completo">
+        </div>
     </div>
 
     <form id="marmitaForm">
         
-        <h3 class="section-title">1. Carboidratos (Máx 2)</h3>
-        <div class="options-grid">
-            <label><input type="checkbox" name="carbo" value="Arroz Integral" onclick="checkLimit(this, 2)"> Arroz Integral</label>
-            <label><input type="checkbox" name="carbo" value="Arroz Branco" onclick="checkLimit(this, 2)"> Arroz Branco</label>
-            <label><input type="checkbox" name="carbo" value="Arroz Parboilizado" onclick="checkLimit(this, 2)"> Arroz Parboilizado</label>
-            <label><input type="checkbox" name="carbo" value="Macarrão Espaguete" onclick="checkLimit(this, 2)"> Macarrão Espaguete</label>
-            <label><input type="checkbox" name="carbo" value="Macarrão Penne" onclick="checkLimit(this, 2)"> Macarrão Penne</label>
-            <label><input type="checkbox" name="carbo" value="Macarrão de Arroz (s/ glúten)" onclick="checkLimit(this, 2)"> Macarrão Arroz s/ Glúten</label>
-            <label><input type="checkbox" name="carbo" value="Batata Baroa" onclick="checkLimit(this, 2)"> Batata Baroa</label>
-            <label><input type="checkbox" name="carbo" value="Batata Inglesa" onclick="checkLimit(this, 2)"> Batata Inglesa</label>
-            <label><input type="checkbox" name="carbo" value="Aipim" onclick="checkLimit(this, 2)"> Aipim</label>
-            <label><input type="checkbox" name="carbo" value="Abóbora Cabotia" onclick="checkLimit(this, 2)"> Abóbora Cabotia</label>
-            <label><input type="checkbox" name="carbo" value="Batata Doce" onclick="checkLimit(this, 2)"> Batata Doce</label>
-            <label><input type="checkbox" name="carbo" value="Feijão" onclick="checkLimit(this, 2)"> Feijão</label>
+        <div class="card">
+            <h3 class="section-title">1. Carboidratos</h3>
+            <p style="font-size:0.85rem; color:#666;">Escolha até 2 opções:</p>
+            <div class="options-grid">
+                <label><input type="checkbox" name="carbo" value="Arroz Integral" onclick="checkLimit(this, 2)"> Arroz Integral</label>
+                <label><input type="checkbox" name="carbo" value="Arroz Branco" onclick="checkLimit(this, 2)"> Arroz Branco</label>
+                <label><input type="checkbox" name="carbo" value="Arroz Parboilizado" onclick="checkLimit(this, 2)"> Arroz Parboilizado</label>
+                <label><input type="checkbox" name="carbo" value="Macarrão Espaguete" onclick="checkLimit(this, 2)"> Macarrão Espaguete</label>
+                <label><input type="checkbox" name="carbo" value="Macarrão Penne" onclick="checkLimit(this, 2)"> Macarrão Penne</label>
+                <label><input type="checkbox" name="carbo" value="Macarrão de Arroz (s/ glúten)" onclick="checkLimit(this, 2)"> Mac. Arroz s/ Glúten</label>
+                <label><input type="checkbox" name="carbo" value="Batata Baroa" onclick="checkLimit(this, 2)"> Batata Baroa</label>
+                <label><input type="checkbox" name="carbo" value="Batata Inglesa" onclick="checkLimit(this, 2)"> Batata Inglesa</label>
+                <label><input type="checkbox" name="carbo" value="Aipim" onclick="checkLimit(this, 2)"> Aipim</label>
+                <label><input type="checkbox" name="carbo" value="Abóbora Cabotia" onclick="checkLimit(this, 2)"> Abóbora Cabotia</label>
+                <label><input type="checkbox" name="carbo" value="Batata Doce" onclick="checkLimit(this, 2)"> Batata Doce</label>
+                <label><input type="checkbox" name="carbo" value="Feijão" onclick="checkLimit(this, 2)"> Feijão</label>
+            </div>
         </div>
 
-        <h3 class="section-title">2. Proteínas (Preferências)</h3>
-        <div class="options-grid">
-            <label><input type="checkbox" name="prot" value="Carne de Panela"> Carne de Panela</label>
-            <label><input type="checkbox" name="prot" value="Carne Moída"> Carne Moída</label>
-            <label><input type="checkbox" name="prot" value="Bife Acebolado"> Bife Acebolado</label>
-            <label><input type="checkbox" name="prot" value="Strogonoff de Carne"> Strogonoff de Carne</label>
-            <label><input type="checkbox" name="prot" value="Frango Sobrecoxa Assada"> Frango Sobrecoxa Assada</label>
-            <label><input type="checkbox" name="prot" value="Frango Sobrecoxa Ensopada"> Frango Sobrecoxa Ensopada</label>
-            <label><input type="checkbox" name="prot" value="Filé de Frango Grelhado"> Filé de Frango Grelhado</label>
-            <label><input type="checkbox" name="prot" value="Frango Desfiado Ensopado"> Frango Desfiado Ensopado</label>
-            <label><input type="checkbox" name="prot" value="Strogonoff de Frango"> Strogonoff de Frango</label>
+        <div class="card">
+            <h3 class="section-title">2. Preferência de Proteínas</h3>
+            <p style="font-size:0.85rem; color:#666;">Quais você mais gosta?</p>
+            <div class="options-grid">
+                <label><input type="checkbox" name="prot" value="Carne de Panela"> Carne de Panela</label>
+                <label><input type="checkbox" name="prot" value="Carne Moída"> Carne Moída</label>
+                <label><input type="checkbox" name="prot" value="Bife Acebolado"> Bife Acebolado</label>
+                <label><input type="checkbox" name="prot" value="Strogonoff de Carne"> Strogonoff de Carne</label>
+                <label><input type="checkbox" name="prot" value="Frango Sobrecoxa Assada"> Frango Sobrecoxa Assada</label>
+                <label><input type="checkbox" name="prot" value="Frango Sobrecoxa Ensopada"> Frango Sobrecoxa Ensopada</label>
+                <label><input type="checkbox" name="prot" value="Filé de Frango Grelhado"> Filé de Frango Grelhado</label>
+                <label><input type="checkbox" name="prot" value="Frango Desfiado Ensopado"> Frango Desfiado Ensopado</label>
+                <label><input type="checkbox" name="prot" value="Strogonoff de Frango"> Strogonoff de Frango</label>
+            </div>
         </div>
 
-        <h3 class="section-title">3. Legumes (Máx 3)</h3>
-        <div class="options-grid">
-            <label><input type="checkbox" name="legume" value="Brócolis" onclick="checkLimit(this, 3)"> Brócolis</label>
-            <label><input type="checkbox" name="legume" value="Couve Mineira" onclick="checkLimit(this, 3)"> Couve Mineira</label>
-            <label><input type="checkbox" name="legume" value="Couve-flor" onclick="checkLimit(this, 3)"> Couve-flor</label>
-            <label><input type="checkbox" name="legume" value="Vagem" onclick="checkLimit(this, 3)"> Vagem</label>
-            <label><input type="checkbox" name="legume" value="Abobrinha Verde" onclick="checkLimit(this, 3)"> Abobrinha Verde</label>
-            <label><input type="checkbox" name="legume" value="Cenoura" onclick="checkLimit(this, 3)"> Cenoura</label>
+        <div class="card">
+            <h3 class="section-title">3. Legumes</h3>
+            <p style="font-size:0.85rem; color:#666;">Escolha até 3 opções:</p>
+            <div class="options-grid">
+                <label><input type="checkbox" name="legume" value="Brócolis" onclick="checkLimit(this, 3)"> Brócolis</label>
+                <label><input type="checkbox" name="legume" value="Couve Mineira" onclick="checkLimit(this, 3)"> Couve Mineira</label>
+                <label><input type="checkbox" name="legume" value="Couve-flor" onclick="checkLimit(this, 3)"> Couve-flor</label>
+                <label><input type="checkbox" name="legume" value="Vagem" onclick="checkLimit(this, 3)"> Vagem</label>
+                <label><input type="checkbox" name="legume" value="Abobrinha Verde" onclick="checkLimit(this, 3)"> Abobrinha Verde</label>
+                <label><input type="checkbox" name="legume" value="Cenoura" onclick="checkLimit(this, 3)"> Cenoura</label>
+            </div>
         </div>
 
-        <h3 class="section-title">Seus Dados</h3>
-        <input type="text" id="clienteNome" placeholder="Seu Nome Completo" style="width:95%; padding:15px; border:1px solid #ccc; border-radius:8px; margin-bottom:10px;">
-        <input type="text" id="obs" placeholder="Observações (opcional)" style="width:95%; padding:15px; border:1px solid #ccc; border-radius:8px;">
+        <div class="card">
+            <h3 class="section-title">Observações</h3>
+            <input type="text" id="obs" placeholder="Ex: Sem sal, sem cebola..." style="margin-top:10px;">
+        </div>
 
-        <button type="button" id="btnFinalizar" onclick="compartilharPedido()">
-            📲 Enviar Pedido no WhatsApp
+        <button type="button" onclick="enviarPedido()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382C17.111 14.201 15.336 13.324 15.003 13.234C14.67 13.143 14.429 13.234 14.189 13.595C13.948 13.956 13.266 14.757 13.061 14.997C12.857 15.237 12.651 15.267 12.291 15.087C11.931 14.907 10.769 14.526 9.39003 13.298C8.28303 12.312 7.53603 11.094 7.32503 10.733C7.11503 10.373 7.30403 10.178 7.48403 9.999C7.64603 9.838 7.84403 9.578 8.02403 9.367C8.20503 9.157 8.26503 9.006 8.38503 8.766C8.50603 8.525 8.44503 8.315 8.35503 8.134C8.26503 7.954 7.54403 6.18 7.24403 5.459C6.95103 4.757 6.65603 4.853 6.43503 4.853C6.22903 4.853 5.99303 4.853 5.75703 4.853C5.52103 4.853 5.13903 4.941 4.81503 5.295C4.49103 5.648 3.57503 6.509 3.57503 8.262C3.57503 10.014 4.85003 11.708 5.03003 11.948C5.21103 12.189 7.53803 15.776 11.082 17.307C11.925 17.671 12.583 17.888 13.099 18.052C13.95 18.322 14.729 18.281 15.337 18.19C16.015 18.089 17.426 17.336 17.726 16.494C18.026 15.653 18.026 14.931 17.936 14.781C17.846 14.63 17.641 14.538 17.281 14.358H17.472Z" fill="white"/></svg>
+            Enviar Pedido via WhatsApp
         </button>
     </form>
-</div>
-
-<div id="pedido-imagem">
-    <div style="text-align:center; border-bottom:2px dashed #D65A18; padding-bottom:10px; margin-bottom:10px;">
-        <h2 style="margin:0; color:#D65A18; font-size:24px;">JO DELÍCIAS</h2>
-        <p style="margin:0; font-size:14px;">PEDIDO DELIVERY</p>
-    </div>
-    <p><strong>Cliente:</strong> <span id="img-nome"></span></p>
-    <p><strong>Data:</strong> <span id="img-data"></span></p>
-    <hr style="border:1px solid #eee;">
     
-    <div style="background:#eee; padding:5px; font-weight:bold;">CARBOIDRATOS (2):</div>
-    <ul id="img-carbos"></ul>
-    
-    <div style="background:#eee; padding:5px; font-weight:bold;">PROTEÍNAS:</div>
-    <ul id="img-prots"></ul>
-    
-    <div style="background:#eee; padding:5px; font-weight:bold;">LEGUMES (3):</div>
-    <ul id="img-legumes"></ul>
-    
-    <hr style="border:1px solid #eee;">
-    <p><strong>Obs:</strong> <span id="img-obs"></span></p>
-    <div style="background:#D65A18; color:white; padding:10px; text-align:center; margin-top:15px; font-weight:bold;">
-        PACOTE 10 UNIDADES
+    <div style="text-align:center; margin-top:30px; color:#888; font-size:0.8rem;">
+        Jo Delícias • (48) 98474-1168
     </div>
 </div>
 
 <script>
-    // 1. Função genérica para limitar checkboxes
     function checkLimit(checkbox, limit) {
         const name = checkbox.name;
         const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
         if (checked.length > limit) {
-            alert(`Ops! Você só pode escolher até ${limit} opções nesta categoria.`);
+            alert(`Você pode escolher no máximo ${limit} opções.`);
             checkbox.checked = false;
         }
     }
 
-    async function compartilharPedido() {
+    function enviarPedido() {
         const nome = document.getElementById('clienteNome').value;
-        if(!nome) { alert("Por favor, preencha seu nome antes de enviar."); return; }
+        if (!nome) { alert("Por favor, digite seu nome no topo da página."); return; }
 
-        const btn = document.getElementById('btnFinalizar');
-        btn.innerText = "Gerando imagem...";
-        btn.disabled = true;
+        // Coleta os dados
+        const getItems = (name) => {
+            const items = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(e => "✅ " + e.value);
+            return items.length > 0 ? items.join("\n") : "❌ Nenhuma opção selecionada";
+        };
 
-        // Preenche os dados no template oculto
-        document.getElementById('img-nome').innerText = nome;
-        document.getElementById('img-data').innerText = new Date().toLocaleDateString();
-        document.getElementById('img-obs').innerText = document.getElementById('obs').value || "-";
+        const carbos = getItems('carbo');
+        const prots = getItems('prot');
+        const legumes = getItems('legume');
+        const obs = document.getElementById('obs').value || "Nenhuma";
 
-        const getItems = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
-                                     .map(e => `<li>${e.value}</li>`).join('');
+        // Monta a mensagem para o WhatsApp (Usa %0A para pular linha)
+        let mensagem = `*OLÁ, JO DELÍCIAS!* \n`;
+        mensagem += `Gostaria de fazer um pedido.\n\n`;
+        mensagem += `👤 *Cliente:* ${nome}\n`;
+        mensagem += `📅 *Data:* ${new Date().toLocaleDateString()}\n`;
+        mensagem += `--------------------------\n`;
+        mensagem += `*🍚 CARBOIDRATOS:*\n${carbos}\n\n`;
+        mensagem += `*🥩 PROTEÍNAS (Preferências):*\n${prots}\n\n`;
+        mensagem += `*🥦 LEGUMES:*\n${legumes}\n`;
+        mensagem += `--------------------------\n`;
+        mensagem += `📝 *Observação:* ${obs}\n\n`;
+        mensagem += `Aguardo a confirmação!`;
+
+        // Codifica para URL
+        const textoCodificado = encodeURIComponent(mensagem);
+        const numero = "5548984741168"; // Seu número
         
-        document.getElementById('img-carbos').innerHTML = getItems('carbo') || "<li>Sem preferência</li>";
-        document.getElementById('img-prots').innerHTML = getItems('prot') || "<li>Padrão</li>";
-        document.getElementById('img-legumes').innerHTML = getItems('legume') || "<li>Sem legumes</li>";
-
-        // Gera a imagem
-        const canvas = await html2canvas(document.getElementById('pedido-imagem'));
-        
-        // Converte o canvas para arquivo (Blob)
-        canvas.toBlob(async (blob) => {
-            const file = new File([blob], `pedido_${nome}.png`, { type: 'image/png' });
-            
-            // Tenta usar o compartilhamento nativo (celular)
-            if (navigator.share) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: 'Meu Pedido Jo Delícias',
-                        text: `Olá! Segue meu pedido de marmitas.`
-                    });
-                    btn.innerText = "Pedido Enviado!";
-                } catch (error) {
-                    console.log('Erro ao compartilhar ou cancelado:', error);
-                    fallbackDownload(canvas, nome); // Se falhar, baixa a imagem
-                }
-            } else {
-                // Se estiver no PC (onde navigator.share raramente funciona com imagens)
-                fallbackDownload(canvas, nome);
-            }
-            
-            btn.disabled = false;
-            setTimeout(() => btn.innerText = "📲 Enviar Pedido no WhatsApp", 3000);
-        });
-    }
-
-    function fallbackDownload(canvas, nome) {
-        // Fallback: Baixa a imagem e abre o link de texto do WhatsApp
-        const link = document.createElement('a');
-        link.download = `Pedido_${nome}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-        
-        const tel = "5548984741168"; // Telefone do PDF
-        alert("Como seu navegador não suporta envio direto de imagem, ela foi baixada! Anexe-a no WhatsApp que vai abrir.");
-        window.open(`https://wa.me/${tel}?text=Olá! Baixei a imagem do meu pedido e estou enviando em anexo.`, '_blank');
+        // Abre o WhatsApp
+        console.log(textoCodificado);   
+        window.open(`https://wa.me/${numero}?text=${textoCodificado}`, '_blank');
     }
 </script>
 
