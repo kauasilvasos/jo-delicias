@@ -233,6 +233,77 @@
             100% { opacity: 1; transform: scale(1.1); }
         }
 
+        .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(74, 59, 50, 0.6); /* Tom marrom escuro transparente */
+        z-index: 9999;
+        display: none; /* Oculto por padrão */
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        backdrop-filter: blur(2px); /* Efeito de vidro fosco */
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            width: 85%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transform: scale(0.8) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .modal-message {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(192, 74, 21, 0.3);
+            transition: transform 0.2s;
+            width: auto; /* Sobrescreve o width:100% dos buttons globais se necessário */
+            display: inline-block;
+        }
+
+        .modal-btn:hover {
+            background-color: var(--primary-light);
+            transform: scale(1.05);
+        }
+
     </style>
 </head>
 <body>
@@ -337,14 +408,40 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="customModal" onclick="fecharModal(event)">
+    <div class="modal-box">
+        <span class="modal-icon" id="modalIcon">⚠️</span>
+        <div class="modal-message" id="modalMessage">Mensagem aqui</div>
+        <button class="modal-btn" onclick="fecharModal(null)">Entendi!</button>
+    </div>
+</div>
+
 <script>
+    // --- FUNÇÕES DO MODAL (Faltavam estas) ---
+    function mostrarModal(mensagem, icone = '⚠️') {
+        const modal = document.getElementById('customModal');
+        // Atualiza o texto e o ícone
+        document.getElementById('modalMessage').innerHTML = mensagem;
+        document.getElementById('modalIcon').innerText = icone;
+        // Mostra o modal
+        modal.classList.add('active');
+    }
+
+    function fecharModal(event) {
+        // Fecha se clicar no botão (event null) ou fora da caixa (target id customModal)
+        if (!event || event.target.id === 'customModal') {
+            document.getElementById('customModal').classList.remove('active');
+        }
+    }
+
+    // --- SEU CÓDIGO DE LIMITES ---
     let limiteProteina = 2; 
 
     function checkLimitFixed(checkbox, limit) {
         const name = checkbox.name;
         const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
         if (checked.length > limit) {
-            alert(`Para este item, você pode escolher no máximo ${limit} opções.`);
+            mostrarModal(`Ops! Para este item, você pode escolher no máximo <b>${limit} opções</b>.`);
             checkbox.checked = false;
         }
     }
@@ -362,7 +459,7 @@
         const subtitle = document.getElementById('subtitle-prot');
         subtitle.innerHTML = `Escolha até <span class="dynamic-limit" style="font-size:1.1rem; font-weight:bold;">${limiteProteina}</span> opções (1 a cada 5 marmitas)`;
 
-        // --- LÓGICA ANTI-BUG ---
+        // LÓGICA ANTI-BUG (Remove excessos se diminuir a quantidade)
         const checkedBoxes = document.querySelectorAll(`input[name="prot"]:checked`);
         const checkedArray = Array.from(checkedBoxes);
         
@@ -372,14 +469,14 @@
                 const itemParaRemover = checkedArray.pop(); 
                 itemParaRemover.checked = false;
             }
-            alert(`Como a quantidade de marmitas mudou, ajustamos suas proteínas para o limite máximo de ${limiteProteina}.`);
+            mostrarModal(`Atualizamos suas proteínas para o novo limite de <b>${limiteProteina}</b> opções.`, 'ℹ️');
         }
     }
 
     function checkProtLimit(checkbox) {
         const checked = document.querySelectorAll(`input[name="prot"]:checked`);
         if (checked.length > limiteProteina) {
-            alert(`Com a quantidade atual de marmitas, você pode escolher até ${limiteProteina} proteínas.`);
+            mostrarModal(`Com a quantidade atual de marmitas, você pode escolher até <b>${limiteProteina} proteínas</b>.`);
             checkbox.checked = false;
         }
     }
@@ -388,8 +485,14 @@
         const nome = document.getElementById('clienteNome').value;
         const quantidade = document.getElementById('quantidade').value;
 
-        if (!nome) { alert("Por favor, digite seu nome no topo da página."); return; }
-        if (!quantidade || quantidade < 10) { alert("A quantidade mínima é de 10 marmitas."); return; }
+        if (!nome) { 
+            mostrarModal("Por favor, digite seu <b>nome completo</b> no topo da página.", '👤'); 
+            return; 
+        }
+        if (!quantidade || quantidade < 10) { 
+            mostrarModal("A quantidade mínima é de <b>10 marmitas</b>.", '📦'); 
+            return; 
+        }
 
         const getItems = (name) => {
             const items = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(e => "✅ " + e.value);
