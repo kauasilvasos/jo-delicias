@@ -163,9 +163,6 @@ function limparSelecoes() {
     document.getElementById('peso-legume').value = CONFIG.pesos.legume.default;
 
     const cartContainer = document.querySelector('.cart-container');
-    if (cartContainer) {
-        window.scrollTo({ top: cartContainer.offsetTop - 100, behavior: 'smooth' });
-    }
 }
 
 function removerDoCarrinho(id) {
