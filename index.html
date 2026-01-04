@@ -4,67 +4,269 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jo Delícias - Monte sua Marmita</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        :root { --primary: #D65A18; --bg: #FDF6E3; --white: #fff; --text: #2C3E50; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; color: var(--text); padding-bottom: 40px; }
-        
-        header { background: var(--primary); color: var(--white); text-align: center; padding: 25px 20px; border-radius: 0 0 25px 25px; box-shadow: 0 4px 10px rgba(214, 90, 24, 0.3); }
-        header h1 { margin: 0; font-size: 1.8rem; }
-        header p { margin: 5px 0 0; opacity: 0.9; }
-
-        .container { max-width: 600px; margin: -20px auto 0; padding: 0 20px; position: relative; z-index: 2; }
-        
-        .card { background: var(--white); border-radius: 15px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-
-        .section-title { color: var(--primary); border-bottom: 2px solid #fee; padding-bottom: 8px; margin-top: 10px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 15px; }
-        
-        label { 
-            background: #f8f9fa; padding: 12px; border-radius: 8px; display: flex; align-items: center; 
-            cursor: pointer; transition: 0.2s; border: 1px solid transparent;
+        :root { 
+            --primary: #C04A15; 
+            --primary-light: #e85a1b;
+            --bg: #FFF5EE; 
+            --card-bg: #ffffff;
+            --text: #4A3b32;
+            --brown-rule: #6D4C41; 
+            --green: #25D366;
+            --font-title: 'Chewy', cursive; 
+            --font-body: 'Poppins', sans-serif;
         }
-        label:hover { background: #fff5f0; border-color: var(--primary); }
-        
-        input[type="checkbox"] { accent-color: var(--primary); width: 20px; height: 20px; margin-right: 12px; }
 
-        .info-box { background: #e3f2fd; color: #0d47a1; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 15px; border-left: 4px solid #2196f3; }
-
-        input[type="text"] {
-            width: 100%; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px;
-            font-family: inherit; box-sizing: border-box; font-size: 1rem;
+        body { 
+            font-family: var(--font-body); 
+            background: var(--bg); 
+            margin: 0; 
+            color: var(--text); 
+            padding-bottom: 80px; /* Espaço extra no fim para não cobrir a imagem */
+            overflow-x: hidden; /* Evita rolagem horizontal indesejada */
         }
+        
+        header { 
+            background-color: var(--primary);
+            background-image: radial-gradient(circle at top, #d4561e, #C04A15);
+            color: white; 
+            text-align: center; 
+            padding: 20px 20px 70px 20px; 
+            border-radius: 0 0 40px 40px; 
+            box-shadow: 0 4px 15px rgba(192, 74, 21, 0.3);
+            position: relative;
+            z-index: 10; /* Header sempre acima */
+        }
+
+        .logo-img {
+            max-width: 400px; /* Maior no Desktop */
+            width: 85%;       /* Ocupa boa parte da tela no Mobile */
+            height: auto;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.25)); 
+            margin-bottom: 5px;
+            animation: popIn 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        header p { 
+            margin: 5px 0 0; 
+            font-family: var(--font-title);
+            font-size: 1.6rem; 
+            color: #fff;
+            opacity: 0.95; 
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .container { 
+            max-width: 600px; 
+            margin: -50px auto 0; 
+            padding: 0 20px; 
+            position: relative; 
+            z-index: 5; /* Conteúdo acima da imagem de fundo */
+        }
+
+        /* CONFIGURAÇÃO DA IMAGEM LATERAL (MARMITAS) */
+        .side-decoration {
+            position: fixed; /* Fica parada enquanto rola a tela */
+            bottom: -20px;
+            left: -30px;
+            width: 380px; /* Tamanho generoso */
+            z-index: 1; /* Fica ATRÁS do formulário */
+            pointer-events: none; /* Permite clicar através dela */
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+
+        /* Ajuste específico para Celular */
+        @media (max-width: 768px) {
+            .side-decoration {
+                width: 250px; /* Um pouco menor no celular para não invadir tudo */
+                left: -40px;
+                bottom: -10px;
+                opacity: 0.9; /* Leve transparência para não brigar com texto */
+            }
+        }
+        
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 25px; 
+            margin-bottom: 25px; 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08); /* Sombra mais suave */
+            border: 1px solid rgba(0,0,0,0.02);
+            position: relative; /* Para o z-index funcionar */
+            z-index: 2; /* Garante que o fundo branco tape a imagem da marmita se sobrepor */
+        }
+
+        .rule-box {
+            background-color: var(--brown-rule);
+            color: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(109, 76, 65, 0.3);
+            border: 1px solid #8D6E63;
+        }
+        
+        .rule-text {
+            font-family: var(--font-body); 
+            font-size: 1rem;
+            line-height: 1.5;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .star-icon {
+            position: absolute;
+            color: #FFC107; 
+            font-size: 1.5rem;
+            animation: twinkle 2s infinite alternate;
+        }
+        .star-tl { top: 10px; left: 10px; }
+        .star-br { bottom: 10px; right: 10px; }
+
+        .section-title { 
+            color: var(--primary); 
+            font-family: var(--font-title);
+            font-size: 1.8rem; 
+            margin-top: 0;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .subtitle {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: -10px;
+            margin-bottom: 15px;
+            display: block;
+            font-weight: 600;
+        }
+        
+        .dynamic-limit { color: var(--primary); }
+
+        .options-grid { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 10px; 
+        }
+        
+        label.option-btn { 
+            background: #fdfbf9; 
+            padding: 14px 16px; 
+            border-radius: 12px; 
+            display: flex; 
+            align-items: center; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            border: 2px solid #eee;
+            font-weight: 500;
+        }
+        
+        label.option-btn:hover { 
+            background: #fff0e6; 
+            border-color: var(--primary-light); 
+            transform: translateY(-2px);
+        }
+
+        input[type="checkbox"]:checked + span { color: var(--primary); font-weight: 700; }
+        input[type="checkbox"] { accent-color: var(--primary); width: 22px; height: 22px; margin-right: 15px; }
+
+        input[type="text"], input[type="number"] {
+            width: 100%; 
+            padding: 16px; 
+            border: 2px solid #eee; 
+            border-radius: 12px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+            background: #fafafa;
+            box-sizing: border-box; 
+        }
+        
+        input[type="text"]:focus, input[type="number"]:focus { border-color: var(--primary); background: #fff; }
 
         button {
-            background-color: #25D366; color: white; border: none; width: 100%; padding: 16px;
-            font-size: 1.1rem; font-weight: 800; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); display: flex; justify-content: center; align-items: center; gap: 10px;
-            transition: transform 0.2s;
+            background-color: var(--green); 
+            color: white; 
+            border: none; 
+            width: 100%; 
+            padding: 18px;
+            font-size: 1.3rem; 
+            font-family: var(--font-title); 
+            border-radius: 50px; 
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 12px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 10;
         }
-        button:active { transform: scale(0.98); }
+        
+        button:hover { background-color: #1ebc57; transform: scale(1.02); }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text); }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.5; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
 
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Jo Delícias</h1>
-    <p>Monte seu Pacote de Marmitas</p>
+    <img src="assets/logo.png" alt="Jo Delícias Logo" class="logo-img">
+    <p>Monte sua Marmita!</p>
 </header>
 
+<img src="assets/marmitas.png" alt="Marmitas Decorativas" class="side-decoration">
+
 <div class="container">
-    
-    <div class="card" style="margin-top: 20px;">
-        <div class="info-box">
-            <strong>📦 Regra do Pacote:</strong><br>
-            Mínimo 10 marmitas (5 carne / 5 frango).
+
+    <p>_</p>
+    <div class="card">
+
+        <div class="rule-box">
+            <span class="star-icon star-tl">✨</span>
+            <div class="rule-text">
+                No mínimo 10 unidades de marmitas.<br>
+                Direito a 5 de carne ou 5 de frango a cada 10 unidades.<br>
+                (1 tipo de proteína a cada 5 marmitas).
+            </div>
+            <span class="star-icon star-br">✨</span>
         </div>
 
-        <div style="text-align: center; margin-bottom: 15px;">
-            <label for="clienteNome" style="display:block; text-align:left; font-weight:600; background:none; padding:0;">Seu Nome:</label>
-            <input type="text" id="clienteNome" placeholder="Digite seu nome completo">
+        <div class="form-group">
+            <label for="clienteNome">Seu Nome Completo:</label>
+            <input type="text" id="clienteNome" placeholder="Ex: Maria da Silva">
+        </div>
+
+        <div class="form-group">
+            <label for="quantidade">Quantidade de Marmitas (Mínimo 10):</label>
+            <input type="number" id="quantidade" value="10" min="10" placeholder="Qtd" oninput="atualizarLimites()">
         </div>
     </div>
 
@@ -72,83 +274,123 @@
         
         <div class="card">
             <h3 class="section-title">1. Carboidratos</h3>
-            <p style="font-size:0.85rem; color:#666;">Escolha até 2 opções:</p>
+            <span class="subtitle">Escolha até 2 opções</span>
             <div class="options-grid">
-                <label><input type="checkbox" name="carbo" value="Arroz Integral" onclick="checkLimit(this, 2)"> Arroz Integral</label>
-                <label><input type="checkbox" name="carbo" value="Arroz Branco" onclick="checkLimit(this, 2)"> Arroz Branco</label>
-                <label><input type="checkbox" name="carbo" value="Arroz Parboilizado" onclick="checkLimit(this, 2)"> Arroz Parboilizado</label>
-                <label><input type="checkbox" name="carbo" value="Macarrão Espaguete" onclick="checkLimit(this, 2)"> Macarrão Espaguete</label>
-                <label><input type="checkbox" name="carbo" value="Macarrão Penne" onclick="checkLimit(this, 2)"> Macarrão Penne</label>
-                <label><input type="checkbox" name="carbo" value="Macarrão de Arroz (s/ glúten)" onclick="checkLimit(this, 2)"> Mac. Arroz s/ Glúten</label>
-                <label><input type="checkbox" name="carbo" value="Batata Baroa" onclick="checkLimit(this, 2)"> Batata Baroa</label>
-                <label><input type="checkbox" name="carbo" value="Batata Inglesa" onclick="checkLimit(this, 2)"> Batata Inglesa</label>
-                <label><input type="checkbox" name="carbo" value="Aipim" onclick="checkLimit(this, 2)"> Aipim</label>
-                <label><input type="checkbox" name="carbo" value="Abóbora Cabotia" onclick="checkLimit(this, 2)"> Abóbora Cabotia</label>
-                <label><input type="checkbox" name="carbo" value="Batata Doce" onclick="checkLimit(this, 2)"> Batata Doce</label>
-                <label><input type="checkbox" name="carbo" value="Feijão" onclick="checkLimit(this, 2)"> Feijão</label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Arroz Integral" onclick="checkLimitFixed(this, 2)"> <span>Arroz Integral</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Arroz Branco" onclick="checkLimitFixed(this, 2)"> <span>Arroz Branco</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Arroz Parboilizado" onclick="checkLimitFixed(this, 2)"> <span>Arroz Parboilizado</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Macarrão Espaguete" onclick="checkLimitFixed(this, 2)"> <span>Macarrão Espaguete</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Macarrão Penne" onclick="checkLimitFixed(this, 2)"> <span>Macarrão Penne</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Macarrão de Arroz (s/ glúten)" onclick="checkLimitFixed(this, 2)"> <span>Mac. Arroz s/ Glúten</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Batata Baroa" onclick="checkLimitFixed(this, 2)"> <span>Batata Baroa</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Batata Inglesa" onclick="checkLimitFixed(this, 2)"> <span>Batata Inglesa</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Aipim" onclick="checkLimitFixed(this, 2)"> <span>Aipim</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Abóbora Cabotia" onclick="checkLimitFixed(this, 2)"> <span>Abóbora Cabotia</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Batata Doce" onclick="checkLimitFixed(this, 2)"> <span>Batata Doce</span></label>
+                <label class="option-btn"><input type="checkbox" name="carbo" value="Feijão" onclick="checkLimitFixed(this, 2)"> <span>Feijão</span></label>
             </div>
         </div>
 
         <div class="card">
-            <h3 class="section-title">2. Preferência de Proteínas</h3>
-            <p style="font-size:0.85rem; color:#666;">Quais você mais gosta?</p>
+            <h3 class="section-title">2. Proteínas</h3>
+            <span class="subtitle" id="subtitle-prot">Escolha até <span class="dynamic-limit">2</span> opções (1 a cada 5 marmitas)</span>
+            
             <div class="options-grid">
-                <label><input type="checkbox" name="prot" value="Carne de Panela"> Carne de Panela</label>
-                <label><input type="checkbox" name="prot" value="Carne Moída"> Carne Moída</label>
-                <label><input type="checkbox" name="prot" value="Bife Acebolado"> Bife Acebolado</label>
-                <label><input type="checkbox" name="prot" value="Strogonoff de Carne"> Strogonoff de Carne</label>
-                <label><input type="checkbox" name="prot" value="Frango Sobrecoxa Assada"> Frango Sobrecoxa Assada</label>
-                <label><input type="checkbox" name="prot" value="Frango Sobrecoxa Ensopada"> Frango Sobrecoxa Ensopada</label>
-                <label><input type="checkbox" name="prot" value="Filé de Frango Grelhado"> Filé de Frango Grelhado</label>
-                <label><input type="checkbox" name="prot" value="Frango Desfiado Ensopado"> Frango Desfiado Ensopado</label>
-                <label><input type="checkbox" name="prot" value="Strogonoff de Frango"> Strogonoff de Frango</label>
+                <label class="option-btn"><input type="checkbox" name="prot" value="Carne de Panela" onclick="checkProtLimit(this)"> <span>Carne de Panela</span></label>
+                <label class="option-btn"><input type="checkbox" name="prot" value="Carne Moída" onclick="checkProtLimit(this)"> <span>Carne Moída</span></label>
+                <label class="option-btn"><input type="checkbox" name="prot" value="Bife Acebolado" onclick="checkProtLimit(this)"> <span>Bife Acebolado</span></label>
+                <label class="option-btn"><input type="checkbox" name="prot" value="Strogonoff de Carne" onclick="checkProtLimit(this)"> <span>Strogonoff de Carne</span></label>
+                <label class="option-btn"><input type="checkbox" name="prot" value="Frango Sobrecoxa Assada" onclick="checkProtLimit(this)"> <span>Frango Sobrecoxa Assada</span></label>
+                <label class="option-btn"><input type="checkbox" name="prot" value="Frango Sobrecoxa Ensopada" onclick="checkProtLimit(this)"> <span>Frango Sobrecoxa Ensopada</span></label>
+                <label class="option-btn"><input type="checkbox" name="prot" value="Filé de Frango Grelhado" onclick="checkProtLimit(this)"> <span>Filé de Frango Grelhado</span></label>
+                <label class="option-btn"><input type="checkbox" name="prot" value="Frango Desfiado Ensopado" onclick="checkProtLimit(this)"> <span>Frango Desfiado Ensopado</span></label>
+                <label class="option-btn"><input type="checkbox" name="prot" value="Strogonoff de Frango" onclick="checkProtLimit(this)"> <span>Strogonoff de Frango</span></label>
             </div>
         </div>
 
         <div class="card">
             <h3 class="section-title">3. Legumes</h3>
-            <p style="font-size:0.85rem; color:#666;">Escolha até 3 opções:</p>
+            <span class="subtitle">Escolha até 3 opções</span>
             <div class="options-grid">
-                <label><input type="checkbox" name="legume" value="Brócolis" onclick="checkLimit(this, 3)"> Brócolis</label>
-                <label><input type="checkbox" name="legume" value="Couve Mineira" onclick="checkLimit(this, 3)"> Couve Mineira</label>
-                <label><input type="checkbox" name="legume" value="Couve-flor" onclick="checkLimit(this, 3)"> Couve-flor</label>
-                <label><input type="checkbox" name="legume" value="Vagem" onclick="checkLimit(this, 3)"> Vagem</label>
-                <label><input type="checkbox" name="legume" value="Abobrinha Verde" onclick="checkLimit(this, 3)"> Abobrinha Verde</label>
-                <label><input type="checkbox" name="legume" value="Cenoura" onclick="checkLimit(this, 3)"> Cenoura</label>
+                <label class="option-btn"><input type="checkbox" name="legume" value="Brócolis" onclick="checkLimitFixed(this, 3)"> <span>Brócolis</span></label>
+                <label class="option-btn"><input type="checkbox" name="legume" value="Couve Mineira" onclick="checkLimitFixed(this, 3)"> <span>Couve Mineira</span></label>
+                <label class="option-btn"><input type="checkbox" name="legume" value="Couve-flor" onclick="checkLimitFixed(this, 3)"> <span>Couve-flor</span></label>
+                <label class="option-btn"><input type="checkbox" name="legume" value="Vagem" onclick="checkLimitFixed(this, 3)"> <span>Vagem</span></label>
+                <label class="option-btn"><input type="checkbox" name="legume" value="Abobrinha Verde" onclick="checkLimitFixed(this, 3)"> <span>Abobrinha Verde</span></label>
+                <label class="option-btn"><input type="checkbox" name="legume" value="Cenoura" onclick="checkLimitFixed(this, 3)"> <span>Cenoura</span></label>
             </div>
         </div>
 
         <div class="card">
             <h3 class="section-title">Observações</h3>
-            <input type="text" id="obs" placeholder="Ex: Sem sal, sem cebola..." style="margin-top:10px;">
+            <input type="text" id="obs" placeholder="Ex: Sem sal, sem cebola..." style="margin-top:5px;">
         </div>
 
         <button type="button" onclick="enviarPedido()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382C17.111 14.201 15.336 13.324 15.003 13.234C14.67 13.143 14.429 13.234 14.189 13.595C13.948 13.956 13.266 14.757 13.061 14.997C12.857 15.237 12.651 15.267 12.291 15.087C11.931 14.907 10.769 14.526 9.39003 13.298C8.28303 12.312 7.53603 11.094 7.32503 10.733C7.11503 10.373 7.30403 10.178 7.48403 9.999C7.64603 9.838 7.84403 9.578 8.02403 9.367C8.20503 9.157 8.26503 9.006 8.38503 8.766C8.50603 8.525 8.44503 8.315 8.35503 8.134C8.26503 7.954 7.54403 6.18 7.24403 5.459C6.95103 4.757 6.65603 4.853 6.43503 4.853C6.22903 4.853 5.99303 4.853 5.75703 4.853C5.52103 4.853 5.13903 4.941 4.81503 5.295C4.49103 5.648 3.57503 6.509 3.57503 8.262C3.57503 10.014 4.85003 11.708 5.03003 11.948C5.21103 12.189 7.53803 15.776 11.082 17.307C11.925 17.671 12.583 17.888 13.099 18.052C13.95 18.322 14.729 18.281 15.337 18.19C16.015 18.089 17.426 17.336 17.726 16.494C18.026 15.653 18.026 14.931 17.936 14.781C17.846 14.63 17.641 14.538 17.281 14.358H17.472Z" fill="white"/></svg>
-            Enviar Pedido via WhatsApp
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382C17.111 14.201 15.336 13.324 15.003 13.234C14.67 13.143 14.429 13.234 14.189 13.595C13.948 13.956 13.266 14.757 13.061 14.997C12.857 15.237 12.651 15.267 12.291 15.087C11.931 14.907 10.769 14.526 9.39003 13.298C8.28303 12.312 7.53603 11.094 7.32503 10.733C7.11503 10.373 7.30403 10.178 7.48403 9.999C7.64603 9.838 7.84403 9.578 8.02403 9.367C8.20503 9.157 8.26503 9.006 8.38503 8.766C8.50603 8.525 8.44503 8.315 8.35503 8.134C8.26503 7.954 7.54403 6.18 7.24403 5.459C6.95103 4.757 6.65603 4.853 6.43503 4.853C6.22903 4.853 5.99303 4.853 5.75703 4.853C5.52103 4.853 5.13903 4.941 4.81503 5.295C4.49103 5.648 3.57503 6.509 3.57503 8.262C3.57503 10.014 4.85003 11.708 5.03003 11.948C5.21103 12.189 7.53803 15.776 11.082 17.307C11.925 17.671 12.583 17.888 13.099 18.052C13.95 18.322 14.729 18.281 15.337 18.19C16.015 18.089 17.426 17.336 17.726 16.494C18.026 15.653 18.026 14.931 17.936 14.781C17.846 14.63 17.641 14.538 17.281 14.358H17.472Z" fill="white"/></svg>
+            ENVIAR PEDIDO
         </button>
     </form>
     
-    <div style="text-align:center; margin-top:30px; color:#888; font-size:0.8rem;">
+    <div style="text-align:center; margin-top:30px; color:#a1887f; font-size:0.9rem; font-weight: 600;">
         Jo Delícias • (48) 98474-1168
     </div>
 </div>
 
 <script>
-    function checkLimit(checkbox, limit) {
+    let limiteProteina = 2; 
+
+    function checkLimitFixed(checkbox, limit) {
         const name = checkbox.name;
         const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
         if (checked.length > limit) {
-            alert(`Você pode escolher no máximo ${limit} opções.`);
+            alert(`Para este item, você pode escolher no máximo ${limit} opções.`);
+            checkbox.checked = false;
+        }
+    }
+
+    function atualizarLimites() {
+        const qtdInput = document.getElementById('quantidade');
+        let qtd = parseInt(qtdInput.value);
+        
+        if (!qtd || qtd < 10) {
+            limiteProteina = 2;
+        } else {
+            limiteProteina = Math.floor(qtd / 5);
+        }
+
+        const subtitle = document.getElementById('subtitle-prot');
+        subtitle.innerHTML = `Escolha até <span class="dynamic-limit" style="font-size:1.1rem; font-weight:bold;">${limiteProteina}</span> opções (1 a cada 5 marmitas)`;
+
+        // --- LÓGICA ANTI-BUG ---
+        const checkedBoxes = document.querySelectorAll(`input[name="prot"]:checked`);
+        const checkedArray = Array.from(checkedBoxes);
+        
+        if (checkedArray.length > limiteProteina) {
+            const excesso = checkedArray.length - limiteProteina;
+            for (let i = 0; i < excesso; i++) {
+                const itemParaRemover = checkedArray.pop(); 
+                itemParaRemover.checked = false;
+            }
+            alert(`Como a quantidade de marmitas mudou, ajustamos suas proteínas para o limite máximo de ${limiteProteina}.`);
+        }
+    }
+
+    function checkProtLimit(checkbox) {
+        const checked = document.querySelectorAll(`input[name="prot"]:checked`);
+        if (checked.length > limiteProteina) {
+            alert(`Com a quantidade atual de marmitas, você pode escolher até ${limiteProteina} proteínas.`);
             checkbox.checked = false;
         }
     }
 
     function enviarPedido() {
         const nome = document.getElementById('clienteNome').value;
-        if (!nome) { alert("Por favor, digite seu nome no topo da página."); return; }
+        const quantidade = document.getElementById('quantidade').value;
 
-        // Coleta os dados
+        if (!nome) { alert("Por favor, digite seu nome no topo da página."); return; }
+        if (!quantidade || quantidade < 10) { alert("A quantidade mínima é de 10 marmitas."); return; }
+
         const getItems = (name) => {
             const items = Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(e => "✅ " + e.value);
             return items.length > 0 ? items.join("\n") : "❌ Nenhuma opção selecionada";
@@ -159,25 +401,22 @@
         const legumes = getItems('legume');
         const obs = document.getElementById('obs').value || "Nenhuma";
 
-        // Monta a mensagem para o WhatsApp (Usa %0A para pular linha)
-        let mensagem = `*OLÁ, JO DELÍCIAS!* \n`;
+        let mensagem = `*OLÁ, JO DELÍCIAS!* 😋\n`;
         mensagem += `Gostaria de fazer um pedido.\n\n`;
         mensagem += `👤 *Cliente:* ${nome}\n`;
+        mensagem += `📦 *Quantidade:* ${quantidade} marmitas\n`;
         mensagem += `📅 *Data:* ${new Date().toLocaleDateString()}\n`;
         mensagem += `--------------------------\n`;
-        mensagem += `*🍚 CARBOIDRATOS:*\n${carbos}\n\n`;
-        mensagem += `*🥩 PROTEÍNAS (Preferências):*\n${prots}\n\n`;
-        mensagem += `*🥦 LEGUMES:*\n${legumes}\n`;
+        mensagem += `*🍚 CARBOIDRATOS (Até 2):*\n${carbos}\n\n`;
+        mensagem += `*🥩 PROTEÍNAS (Até ${limiteProteina}):*\n${prots}\n\n`;
+        mensagem += `*🥦 LEGUMES (Até 3):*\n${legumes}\n`;
         mensagem += `--------------------------\n`;
         mensagem += `📝 *Observação:* ${obs}\n\n`;
         mensagem += `Aguardo a confirmação!`;
 
-        // Codifica para URL
         const textoCodificado = encodeURIComponent(mensagem);
-        const numero = "5548984741168"; // Seu número
+        const numero = "5548984741168"; 
         
-        // Abre o WhatsApp
-        console.log(textoCodificado);   
         window.open(`https://wa.me/${numero}?text=${textoCodificado}`, '_blank');
     }
 </script>
