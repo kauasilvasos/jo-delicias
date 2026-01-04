@@ -3,45 +3,96 @@ let carrinho = []; // Array que guarda os kits
 let isDelivery = false;
 const MINIMO_MARMITAS = 10;
 
-
-
 const CONFIG = {
-        freteMinimo: 5.00,    // Valor fixo de saída (R$ 5,00)
-        precoPorKm: 2.00,     // Quanto aumenta a cada Km (ex: R$ 2,00)
-        telefoneZap: "5548984741168",
-        origemLat: -28.481116, 
-        origemLon: -48.780365  
-    };  
+    freteMinimo: 5.00,
+    precoPorKm: 2.00,
+    telefoneZap: "5548984741168",
+    origemLat: -28.481116, 
+    origemLon: -48.780365,
+    
+    pesos: {
+        carbo:  { min: 60, max: 200, default: 100 },
+        prot:   { min: 90, max: 170, default: 120 },
+        legume: { min: 60, max: 100, default: 80 }
+    }
+};
 
     let valorFreteFinal = 0;
-function calcularFrete() {
-        const btn = document.getElementById('btnFrete');
-        const kmInput = parseFloat(document.getElementById('inputKm').value);
+    let distanciaCalculada = 0;
+async function calcularFrete() {
+    const btn = document.getElementById('btnFrete');
+    const enderecoInput = document.getElementById('endereco').value;
+    
+    // Adiciona a cidade/estado para melhorar a precisão da busca
+    // Exemplo: Se Jo Delícias é de Laguna, forçamos a busca na região
+    const enderecoCompleto = `${enderecoInput}, Santa Catarina, Brasil`;
 
-        if (!kmInput || kmInput <= 0) {
-            mostrarModal("Por favor, insira uma distância válida.", "📏");
-            return;
+    btn.innerHTML = "⏳ Buscando endereço...";
+    btn.disabled = true;
+
+    try {
+        // 1. GEOCODING: Converte Endereço -> Coordenadas (Nominatim API)
+        const responseGeo = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(enderecoCompleto)}&addressdetails=1&limit=1`);
+        const dataGeo = await responseGeo.json();
+
+        if (dataGeo.length === 0) {
+            throw new Error("Endereço não encontrado. Tente ser mais específico (Rua, Número, Bairro).");
         }
 
-        btn.innerHTML = "⏳ Calculando...";
+        const destLat = dataGeo[0].lat;
+        const destLon = dataGeo[0].lon;
 
-        // --- LÓGICA DO CÁLCULO ---
-        // Valor Base (5,00) + (Km * Preço/Km)
-        // Exemplo: 5.00 + (3km * 2.00) = R$ 11,00
-        const calculo = CONFIG.freteMinimo + (kmInput * CONFIG.precoPorKm);
+        btn.innerHTML = "⏳ Calculando rota...";
+
+        // 2. ROUTING: Calcula rota de carro (OSRM API)
+        // Formato OSRM: longitude,latitude
+        const urlRota = `https://router.project-osrm.org/route/v1/driving/${CONFIG.origemLon},${CONFIG.origemLat};${destLon},${destLat}?overview=false`;
         
-        // Arredonda para 2 casas decimais
+        const responseRota = await fetch(urlRota);
+        const dataRota = await responseRota.json();
+
+        if (dataRota.code !== "Ok") {
+            throw new Error("Não foi possível traçar uma rota até este local.");
+        }
+
+        // A API retorna distância em Metros, convertemos para Km
+        const metros = dataRota.routes[0].distance;
+        distanciaCalculada = (metros / 1000).toFixed(1); // Ex: 3.5
+
+        // --- CÁLCULO FINANCEIRO ---
+        const calculo = CONFIG.freteMinimo + (distanciaCalculada * CONFIG.precoPorKm);
         valorFreteFinal = parseFloat(calculo.toFixed(2));
 
-        setTimeout(() => {
-            // Atualiza o botão com o valor visualmente
-            btn.innerHTML = `✅ Frete: R$ ${valorFreteFinal.toFixed(2).replace('.', ',')}`;
-            btn.style.background = "#25D366"; // Verde Sucesso
-            
-            mostrarModal(`Frete calculado: <b>R$ ${valorFreteFinal.toFixed(2).replace('.', ',')}</b><br>(Base R$${CONFIG.freteMinimo} + R$${CONFIG.precoPorKm}/km)`, "🛵");
-        }, 800);
-    }
+        // SUCESSO
+        btn.innerHTML = `✅ Frete: R$ ${valorFreteFinal.toFixed(2).replace('.', ',')} (${distanciaCalculada}km)`;
+        btn.style.background = "#25D366";
+        mostrarModal(`<b>Endereço localizado!</b><br>Distância: ${distanciaCalculada} km<br>Valor do Frete: R$ ${valorFreteFinal.toFixed(2).replace('.', ',')}`, "🛵");
 
+    } catch (error) {
+        console.error(error);
+        mostrarModal(`Erro: ${error.message}<br>Verifique se escreveu o endereço corretamente.`, "❌");
+        btn.innerHTML = "📍 Tentar Novamente";
+        btn.style.background = "#C04A15";
+        btn.disabled = false;
+        valorFreteFinal = 0;
+    }
+}
+
+function alterarPeso(tipo, delta) {
+    const input = document.getElementById(`peso-${tipo}`);
+    const limites = CONFIG.pesos[tipo];
+    
+    let novoValor = parseInt(input.value) + delta;
+    
+    // Garante que não ultrapasse os limites
+    if (novoValor >= limites.min && novoValor <= limites.max) {
+        input.value = novoValor;
+    } else {
+        // Feedback visual de erro (tremidinha ou cor vermelha rápida)
+        input.style.color = 'red';
+        setTimeout(() => input.style.color = 'var(--primary)', 200);
+    }
+}
 
 function mostrarModal(mensagem, icone = '⚠️') {
     const modal = document.getElementById('customModal');
@@ -58,9 +109,8 @@ function fecharModal(event) {
 // --- LÓGICA DO CARRINHO ---
 
 function adicionarAoCarrinho() {
-    // 1. Validação (Mantém a mesma lógica de antes, só removendo o check de carbo/legume pois já tratamos no clique)
+    // 1. Coleta Opções
     const carbos = Array.from(document.querySelectorAll('input[name="carbo"]:checked')).map(el => el.value);
-    // (Nota: A validação de quantidade aqui ainda é bom manter como segurança extra)
     if (carbos.length > 2) { mostrarModal("Máximo de 2 carboidratos.", "🍚"); return; }
 
     const protEl = document.querySelector('input[name="prot"]:checked');
@@ -70,28 +120,28 @@ function adicionarAoCarrinho() {
     const legumes = Array.from(document.querySelectorAll('input[name="legume"]:checked')).map(el => el.value);
     if (legumes.length > 3) { mostrarModal("Máximo de 3 legumes.", "🥦"); return; }
 
+    // 2. Coleta Pesos
+    const pesoCarbo = document.getElementById('peso-carbo').value;
+    const pesoProt = document.getElementById('peso-prot').value;
+    const pesoLegume = document.getElementById('peso-legume').value;
+
     const obs = document.getElementById('obsKit').value;
 
-    // Cria Kit
+    // Cria Kit com Pesos
     const novoKit = {
         id: Date.now(),
         carbos: carbos.length ? carbos.join(", ") : "Sem carbo",
         proteina: proteina,
         legumes: legumes.length ? legumes.join(", ") : "Sem legumes",
+        pesos: { carbo: pesoCarbo, prot: pesoProt, legume: pesoLegume }, // Novo objeto de pesos
         obs: obs
     };
 
     carrinho.push(novoKit);
     renderizarCarrinho();
-    
-    // Limpa o formulário visualmente
-    document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el => el.checked = false);
-    document.getElementById('obsKit').value = "";
+    limparSelecoes(); // Esta função agora deve resetar os pesos também
 
-    // MUDANÇA AQUI:
-    // Não rola mais a tela para baixo automaticamente.
-    // Mostra apenas o sucesso.
-    mostrarModal("Kit adicionado ao carrinho! <br>Clique em <b>'Fazer + 5 Marmitas'</b> para continuar montando.", "✅");
+    mostrarModal("Kit adicionado! <br>Clique em <b>'Fazer + 5 Marmitas'</b> para continuar.", "✅");
 }
 
 function subirParaTopo() {
@@ -108,7 +158,10 @@ function limparSelecoes() {
     // Limpa checkboxes e radios
     document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(el => el.checked = false);
     document.getElementById('obsKit').value = "";
-    // Faz scroll suave até a área do carrinho
+    document.getElementById('peso-carbo').value = CONFIG.pesos.carbo.default;
+    document.getElementById('peso-prot').value = CONFIG.pesos.prot.default;
+    document.getElementById('peso-legume').value = CONFIG.pesos.legume.default;
+
     const cartContainer = document.querySelector('.cart-container');
     if (cartContainer) {
         window.scrollTo({ top: cartContainer.offsetTop - 100, behavior: 'smooth' });
@@ -140,9 +193,9 @@ function renderizarCarrinho() {
             itemDiv.innerHTML = `
                 <div class="cart-item-details">
                     <span class="cart-item-title">Kit #${index + 1} (5 unidades)</span>
-                    <div class="cart-item-desc"><b>Prot:</b> ${kit.proteina}</div>
-                    <div class="cart-item-desc"><b>Carbo:</b> ${kit.carbos}</div>
-                    <div class="cart-item-desc"><b>Leg:</b> ${kit.legumes}</div>
+                    <div class="cart-item-desc"><b>Prot (${kit.pesos.prot}g):</b> ${kit.proteina}</div>
+                    <div class="cart-item-desc"><b>Carbo (${kit.pesos.carbo}g):</b> ${kit.carbos}</div>
+                    <div class="cart-item-desc"><b>Leg (${kit.pesos.legume}g):</b> ${kit.legumes}</div>
                     ${kit.obs ? `<div class="cart-item-desc" style="color:#d35400">Obs: ${kit.obs}</div>` : ''}
                 </div>
                 <button class="btn-remove" onclick="removerDoCarrinho(${kit.id})">Remover</button>
@@ -184,22 +237,19 @@ function setEntrega(status) {
 }
 
 function checkAddress() {
-        const end = document.getElementById('endereco').value;
-        const km = document.getElementById('inputKm').value;
-        const btn = document.getElementById('btnFrete');
-        
-        if (end.length > 5 && km.length > 0) {
-            btn.disabled = false;
-            btn.style.background = "#C04A15";
-            btn.style.color = "white";
-            btn.style.cursor = "pointer";
-        } else {
-            btn.disabled = true;
-            btn.style.background = "#7f8c8d";
-            btn.style.color = "white";
-            btn.style.cursor = "not-allowed";
-        }
+    const end = document.getElementById('endereco').value;
+    const btn = document.getElementById('btnFrete');
+    
+    if (end.length > 8) {
+        btn.disabled = false;
+        btn.style.background = "#C04A15";
+        btn.style.cursor = "pointer";
+    } else {
+        btn.disabled = true;
+        btn.style.background = "#7f8c8d";
+        btn.style.cursor = "not-allowed";
     }
+}
 
 function resetarBotaoFrete() {
         const btn = document.getElementById('btnFrete');
@@ -231,6 +281,7 @@ function enviarPedidoFinal() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
     }
+    if (isDelivery && valorFreteFinal === 0) { mostrarModal("Calcule o frete.", "📍"); return; }
 
     let mensagem = `*OLÁ, JO DELÍCIAS!* 😋\n`;
     mensagem += `Gostaria de fazer um pedido.\n\n`;
@@ -241,21 +292,22 @@ function enviarPedidoFinal() {
     if (isDelivery) {
             const endereco = document.getElementById('endereco').value;
             const horario = document.getElementById('horarioEntrega').value;
-            const kmInfo = document.getElementById('inputKm').value;
             
-            if (!endereco || !horario) {
-                mostrarModal("Preencha endereço e horário.", "🛵");
+            // VALIDAÇÃO: Se não calculou o frete, bloqueia
+            if (valorFreteFinal === 0) {
+                mostrarModal("Por favor, clique no botão <b>Calcular Frete Automático</b> antes de finalizar.", "📍");
                 return;
             }
             
-            if (valorFreteFinal === 0) {
-                mostrarModal("Por favor, clique em <b>Calcular Valor</b> do frete antes de enviar.", "💰");
+            if (!horario) {
+                mostrarModal("Escolha o <b>horário</b> de entrega.", "⏰");
                 return;
             }
 
             mensagem += `🛵 *Tipo:* ENTREGA\n`;
             mensagem += `📍 *Endereço:* ${endereco}\n`;
-            mensagem += `📏 *Distância:* ${kmInfo}km\n`;
+            // Usa a variável global calculada pela API
+            mensagem += `📏 *Distância:* ~${distanciaCalculada}km\n`; 
             mensagem += `💰 *Valor Frete:* R$ ${valorFreteFinal.toFixed(2).replace('.', ',')}\n`;
             mensagem += `⏰ *Horário:* ${horario}\n`;
         } else {
@@ -268,9 +320,9 @@ function enviarPedidoFinal() {
 
     carrinho.forEach((kit, index) => {
         mensagem += `*KIT ${index + 1} (5 unidades):*\n`;
-        mensagem += `🥩 ${kit.proteina}\n`;
-        mensagem += `🍚 ${kit.carbos}\n`;
-        mensagem += `🥦 ${kit.legumes}\n`;
+        mensagem += `🥩 Proteína (${kit.pesos.prot}g): ${kit.proteina}\n`;
+        mensagem += `🍚 Carbo (${kit.pesos.carbo}g): ${kit.carbos}\n`;
+        mensagem += `🥦 Legumes (${kit.pesos.legume}g): ${kit.legumes}\n`;
         if (kit.obs) mensagem += `📝 Obs: ${kit.obs}\n`;
         mensagem += `\n`;
     });
