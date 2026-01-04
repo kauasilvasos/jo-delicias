@@ -7,8 +7,8 @@ const CONFIG = {
     freteMinimo: 5.00,
     precoPorKm: 2.00,
     telefoneZap: "5548984741168",
-    origemLat: -28.481116, 
-    origemLon: -48.780365,
+    origemLat: -27.593967923301133, 
+    origemLon: -48.61509918005286,
     
     pesos: {
         carbo:  { min: 60, max: 200, default: 100 },
